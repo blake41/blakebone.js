@@ -18,5 +18,8 @@ var View = function() {
 	}
 }())
 
-obj = {}
+var obj = {}
+var view = new View
 _.extend(obj, Blakebone.Events)
+obj.on("X", View.callbackFunc)
+obj.trigger("X")
