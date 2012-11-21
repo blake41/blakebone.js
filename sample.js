@@ -1,21 +1,27 @@
-var View = function() {
-	this.callbackFunc = function() {
-		alert('hey');
-	}
-	_.extend(this, Blakebone.Events)
-	this.game = new Game
-	this.game.on("X", function() {alert('callback')})
-}
-
-obj = {
+var gameobj = {
 	defaults : {
 		name : "blake"
 	},
 	sayHello : function() {
 		alert('hey')
+	},
+	init : function() {
+		this.someProp = 'penis'
 	}
 }
-var Game = Blakebone.Model.extend(obj)
-var game = new Game
+var viewobj = {
+	defaults : {
+		name : "bob"
+	},
+	respondToName : function() {
+		alert('name changed')
+	},
+	init : function() {
+		this.someProp = 'penis'
+		this.game = new Game
+		this.game.on("change:name", this.respondToName)
+	}
+}
+var Game = Blakebone.Model.extend(gameobj)
+var View = Blakebone.Model.extend(viewobj)
 var view = new View
-view.trigger("X")
