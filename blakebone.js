@@ -40,7 +40,7 @@
 		// were also going to invoke the init function when we call the constructor
 
 		// parse initialization object to get the user defined properties, methods and init function
-		returnObject = parseInitObject(initObject);
+		var returnObject = parseInitObject(initObject);
 		var methods = returnObject.methods
 		var props = returnObject.props
 		var init = returnObject.init
@@ -67,41 +67,33 @@
 		return F;
 	}
 	var parseInitObject = function(initObject) {
+		var returnObject = {
+			props : {},
+			methods : {},
+			init : function() {}
+		};
 		// we only need to do this if they actually passed in an init object to define their own default properties or functions
 		if (typeof initObject !== "undefined") {
 		// we should have a property called defaults which is an object with properties if the user is defining properties
-			var props = parseProps(initObject);
-			var methods = initObject;
-			var init = parseInit(methods);
+			returnObject.props = parseProps(initObject);
+			returnObject.methods = initObject;
+			returnObject.init = parseInit(methods);
 		}
-		else {
-			var props = {};
-			var methods = {};
-			var init = function() {};
-		}
-		var returnObject = {};
-		returnObject.init = init;
-		returnObject.methods = methods;
-		returnObject.props = props;
 		return returnObject
 	}
 	var parseProps = function(initObject) {
+		var props = {};
 		if (typeof initObject["defaults"] !== "undefined") {
-			var props = initObject["defaults"];
+			props = initObject["defaults"];
 			delete initObject["defaults"];
-		}
-		else {
-			var props = {};
 		}
 		return props;
 	}
 	var parseInit = function(methods) {
+		var init = function() {};
 		if(typeof(methods["init"]) === "function") {
-			var init = methods["init"]
+			init = methods["init"]
 			delete methods["init"]
-		}
-		else {
-			var init = function() {};
 		}
 		return init;
 	}
