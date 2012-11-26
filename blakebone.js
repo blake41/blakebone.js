@@ -28,7 +28,7 @@
 	}
 
 	// copy the functions on the model extension object onto the models prototype
-	_.extend(Model.prototype, modelExtension)
+	_.extend(Modenl.prototype, modelExtension)
 	
 	var extend = function(initObject) {
 		// were going to take an init object
@@ -38,12 +38,21 @@
 		// the properties of the events object, and the models prototype
 		// to the prototype of the constructor function.
 		// were also going to invoke the init function when we call the constructor
+		initObject = initObject || {};
 
-		// parse initialization object to get the user defined properties, methods and init function
-		var returnObject = parseInitObject(initObject);
-		var methods = returnObject.methods
-		var props = returnObject.props
-		var init = returnObject.init
+		var init = function() {};
+		if (typeof initObject.init === "function") {
+			init = initObject.init;
+			delete initObject.init;
+		}
+
+		var props = {};
+		if (typeof initObject.defaults === "object") {
+				props = initObject.defaults;
+				delete initObject.defaults;
+		}
+
+		var methods = initObject;
 
 		// create constructor function
 		var F = function() {
@@ -61,49 +70,14 @@
 		// the context of "this" is the model
 		_.extend(F.prototype, Events, this.prototype)
 
-		// copy any functions defined on the init object to the prototype of F
-		copyUserDefinedFunctionsToPrototype(methods, F)
-
-		return F;
-	}
-	var parseInitObject = function(initObject) {
-		var returnObject = {
-			props : {},
-			methods : {},
-			init : function() {}
-		};
-		// we only need to do this if they actually passed in an init object to define their own default properties or functions
-		if (typeof initObject !== "undefined") {
-		// we should have a property called defaults which is an object with properties if the user is defining properties
-			returnObject.props = parseProps(initObject);
-			returnObject.methods = initObject;
-			returnObject.init = parseInit(methods);
-		}
-		return returnObject
-	}
-	var parseProps = function(initObject) {
-		var props = {};
-		if (typeof initObject["defaults"] !== "undefined") {
-			props = initObject["defaults"];
-			delete initObject["defaults"];
-		}
-		return props;
-	}
-	var parseInit = function(methods) {
-		var init = function() {};
-		if(typeof(methods["init"]) === "function") {
-			init = methods["init"]
-			delete methods["init"]
-		}
-		return init;
-	}
-	var copyUserDefinedFunctionsToPrototype = function(methods, F) {
-		// methods is an object passed in to the extend function with a defaults property and functions defined on it
+		// copy methods to the prototype of F
 		_.each(methods, function(value, key) {
 			if (typeof value === "function") {
 				F.prototype[key] = value;
 			}
-		})
+		});
+
+		return F;
 	}
 
 	var View = Blakebone.View = {
